@@ -21,100 +21,63 @@ namespace AbstractOrderFoodService.ImplementationsList
 
         public List<KitchenViewModel> GetList()
         {
-            List<KitchenViewModel> result = new List<KitchenViewModel>();
-            for (int i = 0; i < source.Kitchens.Count; ++i)
-            {
-                // требуется дополнительно получить список компонентов на складе и их количество
-                List<KitchenCoursesViewModel> KitchenCourses = new List<KitchenCoursesViewModel>();
-                for (int j = 0; j < source.KitchenCourse.Count; ++j)
+            List<KitchenViewModel> result = source.Kitchens
+                .Select(rec => new KitchenViewModel
                 {
-                    if (source.KitchenCourse[j].KitchenId == source.Kitchens[i].Id)
-                    {
-                        string courseName = string.Empty;
-                        for (int k = 0; k < source.Course.Count; ++k)
-                        {
-                            if (source.CourseSetsCourse[j].CoursesId == source.Course[k].Id)
-                            {
-                                courseName = source.Course[k].CoursesName;
-                                break;
-                            }
-                        }
-                        KitchenCourses.Add(new KitchenCoursesViewModel
-                        {
-                            Id = source.KitchenCourse[j].Id,
-                            KitchenId = source.KitchenCourse[j].KitchenId,
-                            CoursesId = source.KitchenCourse[j].CoursesId,
-                            CoursesName = courseName,
-                            Count = source.KitchenCourse[j].Count
-                        });
-                    }
-                }
-                result.Add(new KitchenViewModel
-                {
-                    Id = source.Kitchens[i].Id,
-                    KitchenName = source.Kitchens[i].KitchenName,
-                    KitchenCourses = KitchenCourses
-                });
-            }
+                    Id = rec.Id,
+                    KitchenName = rec.KitchenName,
+                    KitchenCourses = source.KitchenCourse
+                             .Where(recCSC => recCSC.KitchenId == rec.Id)
+                             .Select(recCSC => new KitchenCoursesViewModel
+                              {
+                                 Id = recCSC.Id,
+                                 KitchenId = recCSC.KitchenId,
+                                 CoursesId = recCSC.CoursesId,
+                                 CoursesName = source.Course
+                                     .FirstOrDefault(recC => recC.Id == recCSC.CoursesId)?.CoursesName,
+                                 Count = recCSC.Count
+                             })
+                             .ToList()
+                 })
+                 .ToList();
+        
             return result;
         }
 
         public KitchenViewModel GetElement(int id)
         {
-            for (int i = 0; i < source.Kitchens.Count; ++i)
+            Kitchen element = source.Kitchens.FirstOrDefault(rec => rec.Id == id);
+                        if (element != null)
             {
-                // требуется дополнительно получить список компонентов на складе и их количество
-                List<KitchenCoursesViewModel> KitchenCourses = new List<KitchenCoursesViewModel>();
-                for (int j = 0; j < source.KitchenCourse.Count; ++j)
+                return new KitchenViewModel
                 {
-                    if (source.KitchenCourse[j].KitchenId == source.Kitchens[i].Id)
-                    {
-                        string courseName = string.Empty;
-                        for (int k = 0; k < source.Course.Count; ++k)
-                        {
-                            if (source.CourseSetsCourse[j].CoursesId == source.Course[k].Id)
-                            {
-                                courseName = source.Course[k].CoursesName;
-                                break;
-                            }
-                        }
-                        KitchenCourses.Add(new KitchenCoursesViewModel
-                        {
-                            Id = source.KitchenCourse[j].Id,
-                            KitchenId = source.KitchenCourse[j].KitchenId,
-                            CoursesId = source.KitchenCourse[j].CoursesId,
-                            CoursesName = courseName,
-                            Count = source.KitchenCourse[j].Count
-                        });
-                    }
-                }
-                if (source.Kitchens[i].Id == id)
-                {
-                    return new KitchenViewModel
-                    {
-                        Id = source.Kitchens[i].Id,
-                        KitchenName = source.Kitchens[i].KitchenName,
-                        KitchenCourses = KitchenCourses
-                    };
-                }
+                    Id = element.Id,
+                    KitchenName = element.KitchenName,
+                    KitchenCourses = source.KitchenCourse
+                             .Where(recCSC => recCSC.KitchenId == element.Id)
+                             .Select(recCSC => new KitchenCoursesViewModel
+                             {
+                                 Id = recCSC.Id,
+                                 KitchenId = recCSC.KitchenId,
+                                 CoursesId = recCSC.CoursesId,
+                                 CoursesName = source.Course
+                                     .FirstOrDefault(recC => recC.Id == recCSC.CoursesId)?.CoursesName,
+                                 Count = recCSC.Count
+                             })
+                             .ToList()
+                 };
             }
             throw new Exception("Элемент не найден");
         }
 
         public void AddElement(KitchenBindingModel model)
         {
-            int maxId = 0;
-            for (int i = 0; i < source.Kitchens.Count; ++i)
+            Kitchen element = source.Kitchens.FirstOrDefault(rec => rec.KitchenName == model.KitchenName);
+            if (element != null)
             {
-                if (source.Kitchens[i].Id > maxId)
-                {
-                    maxId = source.Kitchens[i].Id;
-                }
-                if (source.Kitchens[i].KitchenName == model.KitchenName)
-                {
-                    throw new Exception("Уже есть кухня с таким названием");
-                }
+                throw new Exception("Уже есть кухня с таким названием");
             }
+            int maxId = source.Kitchens.Count > 0 ? source.Kitchens.Max(rec => rec.Id) : 0;
             source.Kitchens.Add(new Kitchen
             {
                 Id = maxId + 1,
@@ -124,45 +87,34 @@ namespace AbstractOrderFoodService.ImplementationsList
 
         public void UpdElement(KitchenBindingModel model)
         {
-            int index = -1;
-            for (int i = 0; i < source.Kitchens.Count; ++i)
+            Kitchen element = source.Kitchens.FirstOrDefault(rec =>
+                                        rec.KitchenName == model.KitchenName && rec.Id != model.Id);
+            if (element != null)
             {
-                if (source.Kitchens[i].Id == model.Id)
-                {
-                    index = i;
-                }
-                if (source.Kitchens[i].KitchenName == model.KitchenName &&
-                    source.Kitchens[i].Id != model.Id)
-                {
-                    throw new Exception("Уже есть кухня с таким названием");
-                }
+                throw new Exception("Уже есть кухня с таким названием");
             }
-            if (index == -1)
+            element = source.Kitchens.FirstOrDefault(rec => rec.Id == model.Id);
+            if (element == null)
             {
                 throw new Exception("Элемент не найден");
             }
-            source.Kitchens[index].KitchenName = model.KitchenName;
+            element.KitchenName = model.KitchenName;
         }
 
         public void DelElement(int id)
         {
-            // при удалении удаляем все записи о компонентах на удаляемом складе
-            for (int i = 0; i < source.KitchenCourse.Count; ++i)
+            Kitchen element = source.Kitchens.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                if (source.KitchenCourse[i].KitchenId == id)
-                {
-                    source.KitchenCourse.RemoveAt(i--);
-                }
+                // при удалении удаляем все записи о компонентах на удаляемом складе
+                source.KitchenCourse.RemoveAll(rec => rec.KitchenId == id);
+                source.Kitchens.Remove(element);
             }
-            for (int i = 0; i < source.Kitchens.Count; ++i)
+            else
             {
-                if (source.Kitchens[i].Id == id)
-                {
-                    source.Kitchens.RemoveAt(i);
-                    return;
-                }
+                throw new Exception("Элемент не найден");
             }
-            throw new Exception("Элемент не найден");
+            
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using AbstractOrderFoodService.BindingModel;
+﻿using AbstractOrderFood;
+using AbstractOrderFoodService.BindingModel;
 using AbstractOrderFoodService.ImplementationOfInter;
 using AbstractOrderFoodService.Interfaces;
 using System;
@@ -20,31 +21,26 @@ namespace AbstractOrderFoodService.ImplementationsList
 
         public List<ChefsViewModel> GetList()
         {
-            List<ChefsViewModel> result = new List<ChefsViewModel>();
-            for (int i = 0; i < source.Chef.Count; ++i)
-            {
-                result.Add(new ChefsViewModel
+            List<ChefsViewModel> result = source.Chef
+                .Select(rec => new ChefsViewModel
                 {
-                    Id = source.Chef[i].Id,
-                    ChefsFIO = source.Chef[i].ChefsFIO
-                });
-            }
-
+                    Id = rec.Id,
+                    ChefsFIO = rec.ChefsFIO
+                })
+                .ToList();
             return result;
         }
 
         public ChefsViewModel GetElement(int id)
         {
-            for (int i = 0; i < source.Chef.Count; ++i)
+            Chefs element = source.Chef.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                if (source.Chef[i].Id == id)
+                return new ChefsViewModel
                 {
-                    return new ChefsViewModel
-                    {
-                        Id = source.Chef[i].Id,
-                        ChefsFIO = source.Chef[i].ChefsFIO
-                    };
-                }
+                    Id = element.Id,
+                    ChefsFIO = element.ChefsFIO
+                };
             }
 
             throw new Exception("Элемент не найден");
@@ -52,19 +48,13 @@ namespace AbstractOrderFoodService.ImplementationsList
 
         public void AddElement(ChefsBindingModel model)
         {
-            int maxId = 0;
-            for (int i = 0; i < source.Chef.Count; ++i)
+            Chefs element = source.Chef.FirstOrDefault(rec => rec.ChefsFIO == model.ChefsFIO);
+            if (element != null)
             {
-                if (source.Chef[i].Id > maxId)
-                {
-                    maxId = source.Chef[i].Id;
-                }
-                if (source.Chef[i].ChefsFIO == model.ChefsFIO)
-                {
-                    throw new Exception("Уже есть шеф-повар с таким ФИО");
-                }
+                throw new Exception("Уже есть шеф-повар с таким ФИО");
             }
-            source.Chef.Add(new AbstractOrderFood.Chefs
+            int maxId = source.Chef.Count > 0 ? source.Chef.Max(rec => rec.Id) : 0;
+            source.Chef.Add(new Chefs
             {
                 Id = maxId + 1,
                 ChefsFIO = model.ChefsFIO
@@ -73,37 +63,31 @@ namespace AbstractOrderFoodService.ImplementationsList
        
         public void UpdElement(ChefsBindingModel model)
         {
-            int index = -1;
-            for (int i = 0; i < source.Chef.Count; ++i)
+            Chefs element = source.Chef.FirstOrDefault(rec =>
+                                        rec.ChefsFIO == model.ChefsFIO && rec.Id != model.Id);
+            if (element != null)
             {
-                if (source.Chef[i].Id == model.Id)
-                {
-                    index = i;
-                }
-                if (source.Chef[i].ChefsFIO == model.ChefsFIO &&
-                    source.Chef[i].Id != model.Id)
-                {
-                    throw new Exception("Уже есть шеф-повар с таким ФИО");
-                }
+                throw new Exception("Уже есть шеф-повар с таким ФИО");
             }
-            if (index == -1)
+            element = source.Chef.FirstOrDefault(rec => rec.Id == model.Id);
+            if (element == null)
             {
                 throw new Exception("Элемент не найден");
             }
-            source.Chef[index].ChefsFIO = model.ChefsFIO;
+            element.ChefsFIO = model.ChefsFIO;
         }
 
         public void DelElement(int id)
         {
-            for (int i = 0; i < source.Chef.Count; ++i)
+            Chefs element = source.Chef.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                if (source.Chef[i].Id == id)
-                {
-                    source.Chef.RemoveAt(i);
-                    return;
-                }
+                source.Chef.Remove(element);
             }
-            throw new Exception("Элемент не найден");
+            else
+            {
+                throw new Exception("Элемент не найден");
+            }
         }
     }
 }
