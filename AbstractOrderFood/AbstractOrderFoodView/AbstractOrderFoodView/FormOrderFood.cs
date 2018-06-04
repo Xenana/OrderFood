@@ -1,4 +1,5 @@
-﻿using AbstractOrderFoodService.ImplementationOfInter;
+﻿using AbstractOrderFoodService.BindingModel;
+using AbstractOrderFoodService.ImplementationOfInter;
 using AbstractOrderFoodService.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -15,10 +16,13 @@ namespace AbstractOrderFoodView
 
         private readonly IOrderFoodService service;
 
-        public FormOrderFood(IOrderFoodService service)
+        private readonly IReportService reportService;
+
+        public FormOrderFood(IOrderFoodService service, IReportService reportService)
         {
             InitializeComponent();
             this.service = service;
+            this.reportService = reportService;
         }
 
         private void LoadData()
@@ -133,6 +137,41 @@ namespace AbstractOrderFoodView
         private void buttonRef_Click(object sender, EventArgs e)
         {
             LoadData();
+        }
+
+        private void прайсНоборовБлюдToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog
+            {
+                Filter = "doc|*.doc|docx|*.docx"
+            };
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    reportService.SaveCourseSetPrice(new ReportBindingModel
+                    {
+                        FileName = sfd.FileName
+                    });
+                    MessageBox.Show("Выполнено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void загруженностьКухоньToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var form = Container.Resolve<FormKitchensLoad>();
+            form.ShowDialog();
+        }
+
+        private void заказыЗаказчиковToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var form = Container.Resolve<FormCustomerBaskets>();
+            form.ShowDialog();
         }
     }
 }

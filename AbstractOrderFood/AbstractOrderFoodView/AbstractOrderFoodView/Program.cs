@@ -35,7 +35,7 @@ namespace AbstractOrderFoodView
             currentContainer.RegisterType<ICourseSetsService, CourseSetsServiceBD>(new HierarchicalLifetimeManager());
             currentContainer.RegisterType<IKitchenService, KitchenServiceBD>(new HierarchicalLifetimeManager());
             currentContainer.RegisterType<IOrderFoodService, OrderFoodServiceBD>(new HierarchicalLifetimeManager());
-
+            currentContainer.RegisterType<IReportService, ReportServiceBD>(new HierarchicalLifetimeManager());
             return currentContainer;
         }
     }
