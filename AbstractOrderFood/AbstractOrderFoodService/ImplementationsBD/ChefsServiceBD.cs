@@ -8,20 +8,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AbstractOrderFoodService.ImplementationsList
+namespace AbstractOrderFoodService.ImplementationsBD
 {
-    public class ChefsServiceList : IChefsService
+    public class ChefsServiceBD : IChefsService
     {
-        private DataListSingleton source;
+        private AbstractDbContext context;
 
-        public ChefsServiceList()
+        public ChefsServiceBD(AbstractDbContext context)
         {
-            source = DataListSingleton.GetInstance();
+            this.context = context;
         }
 
         public List<ChefsViewModel> GetList()
         {
-            List<ChefsViewModel> result = source.Chef
+            List<ChefsViewModel> result = context.Chef
                 .Select(rec => new ChefsViewModel
                 {
                     Id = rec.Id,
@@ -29,19 +29,11 @@ namespace AbstractOrderFoodService.ImplementationsList
                 })
                 .ToList();
             return result;
-
-            /*List<ChefsViewModel> result = (from rec in source.Chef
-                                         select new ChefsViewModel
-                                         {
-                                             Id = rec.Id,
-                                             ChefsFIO = rec.ChefsFIO
-                                         }).ToList();
-            return result;*/
         }
 
         public ChefsViewModel GetElement(int id)
         {
-            Chefs element = source.Chef.FirstOrDefault(rec => rec.Id == id);
+            Chefs element = context.Chef.FirstOrDefault(rec => rec.Id == id);
             if (element != null)
             {
                 return new ChefsViewModel
@@ -50,47 +42,47 @@ namespace AbstractOrderFoodService.ImplementationsList
                     ChefsFIO = element.ChefsFIO
                 };
             }
-
             throw new Exception("Элемент не найден");
         }
 
         public void AddElement(ChefsBindingModel model)
         {
-            Chefs element = source.Chef.FirstOrDefault(rec => rec.ChefsFIO == model.ChefsFIO);
+            Chefs element = context.Chef.FirstOrDefault(rec => rec.ChefsFIO == model.ChefsFIO);
             if (element != null)
             {
                 throw new Exception("Уже есть шеф-повар с таким ФИО");
             }
-            int maxId = source.Chef.Count > 0 ? source.Chef.Max(rec => rec.Id) : 0;
-            source.Chef.Add(new Chefs
+            context.Chef.Add(new Chefs
             {
-                Id = maxId + 1,
                 ChefsFIO = model.ChefsFIO
             });
+            context.SaveChanges();
         }
-       
+
         public void UpdElement(ChefsBindingModel model)
         {
-            Chefs element = source.Chef.FirstOrDefault(rec =>
+            Chefs element = context.Chef.FirstOrDefault(rec =>
                                         rec.ChefsFIO == model.ChefsFIO && rec.Id != model.Id);
             if (element != null)
             {
                 throw new Exception("Уже есть шеф-повар с таким ФИО");
             }
-            element = source.Chef.FirstOrDefault(rec => rec.Id == model.Id);
+            element = context.Chef.FirstOrDefault(rec => rec.Id == model.Id);
             if (element == null)
             {
                 throw new Exception("Элемент не найден");
             }
             element.ChefsFIO = model.ChefsFIO;
+            context.SaveChanges();
         }
 
         public void DelElement(int id)
         {
-            Chefs element = source.Chef.FirstOrDefault(rec => rec.Id == id);
+            Chefs element = context.Chef.FirstOrDefault(rec => rec.Id == id);
             if (element != null)
             {
-                source.Chef.Remove(element);
+                context.Chef.Remove(element);
+                context.SaveChanges();
             }
             else
             {
