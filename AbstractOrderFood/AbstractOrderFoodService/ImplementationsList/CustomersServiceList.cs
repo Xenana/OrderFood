@@ -29,7 +29,14 @@ namespace AbstractOrderFoodService.ImplementationsList
                 })
             .ToList();
             return result;
-            
+
+            /*List<CustomersViewModel> result1 = (from rec in source.Customer
+                                                select new CustomersViewModel
+                                                {
+                                                    Id = rec.Id,
+                                                    CustomersFIO = rec.CustomersFIO
+                                                }).ToList();
+            return result1;*/
         }
 
         public CustomersViewModel GetElement(int id)

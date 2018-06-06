@@ -29,14 +29,6 @@ namespace AbstractOrderFoodService.ImplementationsList
                 })
                 .ToList();
             return result;
-
-            /*List<ChefsViewModel> result = (from rec in source.Chef
-                                         select new ChefsViewModel
-                                         {
-                                             Id = rec.Id,
-                                             ChefsFIO = rec.ChefsFIO
-                                         }).ToList();
-            return result;*/
         }
 
         public ChefsViewModel GetElement(int id)

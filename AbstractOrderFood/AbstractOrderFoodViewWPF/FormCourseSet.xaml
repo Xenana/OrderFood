@@ -1,0 +1,25 @@
+﻿<Window x:Class="AbstractOrderFoodViewWPF.FormCourseSet"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AbstractOrderFoodViewWPF"
+        mc:Ignorable="d"
+        Title="Набор блюд" Height="450" Width="500.584">
+    <Grid Margin="0,0,3.6,0">
+        <Label Content="Название:" HorizontalAlignment="Left" Margin="10,11,0,0" VerticalAlignment="Top"/>
+        <Label Content="Стоимость:" HorizontalAlignment="Left" Margin="10,56,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.408,0.575"/>
+        <TextBox Name="textBoxName" HorizontalAlignment="Left" Height="23" Margin="97,15,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="349"/>
+        <TextBox Name="textBoxPrice" HorizontalAlignment="Left" Height="23" Margin="97,60,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="193"/>
+        <GroupBox Name="groupBoxCourse" Header="Блюда" HorizontalAlignment="Left" Height="280" Margin="10,87,0,0" VerticalAlignment="Top" Width="357">
+            <DataGrid Name="dataGridView" HorizontalAlignment="Left" Height="270" VerticalAlignment="Top" Width="347" Margin="0,0,-3,-11.6"/>
+        </GroupBox>
+        <Button Name="buttonAdd" Content="Добавить" HorizontalAlignment="Left" Margin="391,109,0,0" VerticalAlignment="Top" Width="75" Click="buttonAdd_Click"/>
+        <Button Name="buttonUpd" Content="Изменить" HorizontalAlignment="Left" Margin="391,163,0,0" VerticalAlignment="Top" Width="75" Click="buttonUpd_Click"/>
+        <Button Name="buttonDel" Content="Удалить" HorizontalAlignment="Left" Margin="391,214,0,0" VerticalAlignment="Top" Width="75" Click="buttonDel_Click"/>
+        <Button Name="buttonRef" Content="Обновить" HorizontalAlignment="Left" Margin="391,275,0,0" VerticalAlignment="Top" Width="75" Click="buttonRef_Click"/>
+        <Button Name="buttonSave" Content="Сохранить" HorizontalAlignment="Left" Margin="262,391,0,0" VerticalAlignment="Top" Width="75" Click="buttonSave_Click"/>
+        <Button Name="buttonCancel" Content="Отмена" HorizontalAlignment="Left" Margin="391,391,0,0" VerticalAlignment="Top" Width="75" Click="buttonCancel_Click"/>
+
+    </Grid>
+</Window>
