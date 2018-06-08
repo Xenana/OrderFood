@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbstractOrderFoodService", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbstractOrderFoodView", "AbstractOrderFoodView\AbstractOrderFoodView\AbstractOrderFoodView.csproj", "{CB9F580A-9EA6-4656-AD65-690F8AC21084}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbstractOrderFoodViewWPF", "AbstractOrderFoodViewWPF\AbstractOrderFoodViewWPF.csproj", "{A1FDEBAA-B2B1-4112-83EA-0B73431E0848}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbstractOrderFoodViewWPF", "..\..\лаба 10 ВПФ\AbstractOrderFood\AbstractOrderFoodViewWPF\AbstractOrderFoodViewWPF.csproj", "{A1FDEBAA-B2B1-4112-83EA-0B73431E0848}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +38,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {F8960399-002A-4701-890B-C990C9FB96B6}
+		SolutionGuid = {688199CD-3BD5-489D-B85E-90672DDAD18F}
 	EndGlobalSection
 EndGlobal

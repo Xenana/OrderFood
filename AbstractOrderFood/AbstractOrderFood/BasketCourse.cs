@@ -25,5 +25,11 @@ namespace AbstractOrderFood
         public DateTime DateCreate { get; set; }
 
         public DateTime? DateImplement { get; set; }
+
+        public virtual Customers Customers { get; set; }
+
+        public virtual CourseSets CourseSets { get; set; }
+
+        public virtual Chefs Chefs { get; set; }
     }
 }
