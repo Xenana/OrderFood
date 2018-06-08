@@ -8,33 +8,32 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AbstractOrderFoodService.ImplementationsList
+namespace AbstractOrderFoodService.ImplementationsBD
 {
-    public class CustomersServiceList : ICustomersService
+    public class CustomersServiceBD : ICustomersService
     {
-        private DataListSingleton source;
+        private AbstractDbContext context;
 
-        public CustomersServiceList()
+        public CustomersServiceBD(AbstractDbContext context)
         {
-            source = DataListSingleton.GetInstance();
+            this.context = context;
         }
 
         public List<CustomersViewModel> GetList()
         {
-            List<CustomersViewModel> result = source.Customer
+            List<CustomersViewModel> result = context.Customer
                 .Select(rec => new CustomersViewModel
                 {
                     Id = rec.Id,
                     CustomersFIO = rec.CustomersFIO
                 })
-            .ToList();
+                .ToList();
             return result;
-            
         }
 
         public CustomersViewModel GetElement(int id)
         {
-            Customers element = source.Customer.FirstOrDefault(rec => rec.Id == id);
+            Customers element = context.Customer.FirstOrDefault(rec => rec.Id == id);
             if (element != null)
             {
                 return new CustomersViewModel
@@ -43,47 +42,47 @@ namespace AbstractOrderFoodService.ImplementationsList
                     CustomersFIO = element.CustomersFIO
                 };
             }
-
             throw new Exception("Элемент не найден");
         }
 
         public void AddElement(CustomersBindingModel model)
         {
-            Customers element = source.Customer.FirstOrDefault(rec => rec.CustomersFIO == model.CustomersFIO);
+            Customers element = context.Customer.FirstOrDefault(rec => rec.CustomersFIO == model.CustomersFIO);
             if (element != null)
             {
                 throw new Exception("Уже есть заказчик с таким ФИО");
             }
-            int maxId = source.Customer.Count > 0 ? source.Customer.Max(rec => rec.Id) : 0;
-            source.Customer.Add(new Customers
+            context.Customer.Add(new Customers
             {
-                Id = maxId + 1,
                 CustomersFIO = model.CustomersFIO
             });
+            context.SaveChanges();
         }
 
         public void UpdElement(CustomersBindingModel model)
         {
-            Customers element = source.Customer.FirstOrDefault(rec =>
-                                       rec.CustomersFIO == model.CustomersFIO && rec.Id != model.Id);
+            Customers element = context.Customer.FirstOrDefault(rec =>
+                                    rec.CustomersFIO == model.CustomersFIO && rec.Id != model.Id);
             if (element != null)
             {
                 throw new Exception("Уже есть заказчик с таким ФИО");
             }
-            element = source.Customer.FirstOrDefault(rec => rec.Id == model.Id);
+            element = context.Customer.FirstOrDefault(rec => rec.Id == model.Id);
             if (element == null)
             {
                 throw new Exception("Элемент не найден");
             }
             element.CustomersFIO = model.CustomersFIO;
+            context.SaveChanges();
         }
 
         public void DelElement(int id)
         {
-            Customers element = source.Customer.FirstOrDefault(rec => rec.Id == id);
+            Customers element = context.Customer.FirstOrDefault(rec => rec.Id == id);
             if (element != null)
             {
-                source.Customer.Remove(element);
+                context.Customer.Remove(element);
+                context.SaveChanges();
             }
             else
             {
