@@ -12,9 +12,9 @@ namespace AbstractOrderFoodService.ImplementationsBD
 {
     public class CustomersServiceBD : ICustomersService
     {
-        private AbstractDbContext context;
+        private OrderFoodDbContext context;
 
-        public CustomersServiceBD(AbstractDbContext context)
+        public CustomersServiceBD(OrderFoodDbContext context)
         {
             this.context = context;
         }

@@ -9,10 +9,10 @@ using AbstractOrderFood;
 
 namespace AbstractOrderFoodService
 {
-    [Table("AbstractDatabase")]
-    public class AbstractDbContext : DbContext
+    [Table("OrderFoodWPFDatabase")]
+    public class OrderFoodDbContext : DbContext
     {
-        public AbstractDbContext() 
+        public OrderFoodDbContext()
         {
             //настройки конфигурации для entity
             Configuration.ProxyCreationEnabled = false;

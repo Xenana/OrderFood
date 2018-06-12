@@ -1,9 +1,6 @@
-﻿using AbstractOrderFoodService;
-using AbstractOrderFoodService.ImplementationsBD;
-using AbstractOrderFoodService.ImplementationsList;
+﻿using AbstractOrderFoodService.ImplementationsList;
 using AbstractOrderFoodService.Interfaces;
 using System;
-using System.Data.Entity;
 using System.Windows.Forms;
 using Unity;
 using Unity.Lifetime;
@@ -28,13 +25,12 @@ namespace AbstractOrderFoodView
         public static IUnityContainer BuildUnityContainer()
         {
             var currentContainer = new UnityContainer();
-            currentContainer.RegisterType<DbContext, AbstractDbContext>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<ICustomersService, CustomersServiceBD>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<ICoursesService, CoursesServiceBD>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IChefsService, ChefsServiceBD>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<ICourseSetsService, CourseSetsServiceBD>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IKitchenService, KitchenServiceBD>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IOrderFoodService, OrderFoodServiceBD>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<ICustomersService, CustomersServiceList>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<ICoursesService, CoursesServiceList>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<IChefsService, ChefsServiceList>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<ICourseSetsService, CourseSetsServiceList>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<IKitchenService, KitchenServiceList>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<IOrderFoodService, OrderFoodServiceList>(new HierarchicalLifetimeManager());
 
             return currentContainer;
         }

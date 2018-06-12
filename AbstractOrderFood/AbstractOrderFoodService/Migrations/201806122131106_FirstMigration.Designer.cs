@@ -13,7 +13,7 @@ namespace AbstractOrderFoodService.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201803100840456_FirstMigration"; }
+            get { return "201806122131106_FirstMigration"; }
         }
         
         string IMigrationMetadata.Source

@@ -14,9 +14,9 @@ namespace AbstractOrderFoodService.ImplementationsBD
 {
     public class OrderFoodServiceBD : IOrderFoodService
     {
-        private AbstractDbContext context;
+        private OrderFoodDbContext context;
 
-        public OrderFoodServiceBD(AbstractDbContext context)
+        public OrderFoodServiceBD(OrderFoodDbContext context)
         {
             this.context = context;
         }

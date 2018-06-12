@@ -31,5 +31,6 @@ namespace AbstractOrderFood
         public virtual CourseSets CourseSets { get; set; }
 
         public virtual Chefs Chefs { get; set; }
+
     }
 }

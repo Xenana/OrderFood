@@ -5,14 +5,14 @@ namespace AbstractOrderFoodService.Migrations
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<AbstractOrderFoodService.AbstractDbContext>
+    internal sealed class Configuration : DbMigrationsConfiguration<AbstractOrderFoodService.OrderFoodDbContext>
     {
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
         }
 
-        protected override void Seed(AbstractOrderFoodService.AbstractDbContext context)
+        protected override void Seed(AbstractOrderFoodService.OrderFoodDbContext context)
         {
             //  This method will be called after migrating to the latest version.
 
