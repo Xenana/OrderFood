@@ -21,31 +21,27 @@ namespace AbstractOrderFoodService.ImplementationsList
 
         public List<CoursesViewModel> GetList()
         {
-            List<CoursesViewModel> result = new List<CoursesViewModel>();
-            for (int i = 0; i < source.Course.Count; ++i)
-            {
-                result.Add(new CoursesViewModel
+            List<CoursesViewModel> result = source.Course
+                .Select(rec => new CoursesViewModel
                 {
-                    Id = source.Course[i].Id,
-                    CoursesName = source.Course[i].CoursesName
-                });
-            }
+                    Id = rec.Id,
+                    CoursesName = rec.CoursesName
+                })
+                .ToList();
 
             return result;
         }
 
         public CoursesViewModel GetElement(int id)
         {
-            for (int i = 0; i < source.Course.Count; ++i)
+            Courses element = source.Course.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                if (source.Course[i].Id == id)
+                return new CoursesViewModel
                 {
-                    return new CoursesViewModel
-                    {
-                        Id = source.Course[i].Id,
-                        CoursesName = source.Course[i].CoursesName
-                    };
-                }
+                    Id = element.Id,
+                    CoursesName = element.CoursesName
+                };
             }
 
             throw new Exception("Элемент не найден");
@@ -53,19 +49,13 @@ namespace AbstractOrderFoodService.ImplementationsList
 
         public void AddElement(CoursesBindingModel model)
         {
-            int maxId = 0;
-            for (int i = 0; i < source.Course.Count; ++i)
+            Courses element = source.Course.FirstOrDefault(rec => rec.CoursesName == model.CoursesName);
+            if (element != null)
             {
-                if (source.Course[i].Id > maxId)
-                {
-                    maxId = source.Course[i].Id;
-                }
-                if (source.Course[i].CoursesName == model.CoursesName)
-                {
-                    throw new Exception("Уже есть блюдо с таким названием");
-                }
+                throw new Exception("Уже есть блюдо с таким названием");
             }
-            source.Course.Add(new AbstractOrderFood.Courses
+            int maxId = source.Course.Count > 0 ? source.Course.Max(rec => rec.Id) : 0;
+            source.Course.Add(new Courses
             {
                 Id = maxId + 1,
                 CoursesName = model.CoursesName
@@ -74,36 +64,31 @@ namespace AbstractOrderFoodService.ImplementationsList
 
         public void UpdElement(CoursesBindingModel model)
         {
-            int index = -1;
-            for (int i = 0; i < source.Course.Count; ++i)
+            Courses element = source.Course.FirstOrDefault(rec =>
+                                        rec.CoursesName == model.CoursesName && rec.Id != model.Id);
+            if (element != null)
             {
-                if (source.Course[i].Id == model.Id)
-                {
-                    index = i;
-                }
-                if (source.Course[i].CoursesName == model.CoursesName && source.Course[i].Id != model.Id)
-                {
-                    throw new Exception("Уже есть блюдо с таким названием");
-                }
+                throw new Exception("Уже есть блюдо с таким названием");
             }
-            if (index == -1)
+            element = source.Course.FirstOrDefault(rec => rec.Id == model.Id);
+            if (element == null)
             {
                 throw new Exception("Элемент не найден");
             }
-            source.Course[index].CoursesName = model.CoursesName;
+            element.CoursesName = model.CoursesName;
         }
 
         public void DelElement(int id)
         {
-            for (int i = 0; i < source.Course.Count; ++i)
+            Courses element = source.Course.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                if (source.Course[i].Id == id)
-                {
-                    source.Course.RemoveAt(i);
-                    return;
-                }
+                source.Course.Remove(element);
             }
-            throw new Exception("Элемент не найден");
+            else
+            {
+                throw new Exception("Элемент не найден");
+            }
         }
     }
 }
