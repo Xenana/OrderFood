@@ -15,5 +15,9 @@ namespace AbstractOrderFood
         public int CoursesId { get; set; }
 
         public int Count { get; set; }
+
+        public virtual CourseSets CourseSets { get; set; }
+
+        public virtual Courses Courses { get; set; }
     }
 }
