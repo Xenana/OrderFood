@@ -1,4 +1,5 @@
-﻿using AbstractOrderFoodService.BindingModel;
+﻿using AbstractOrderFood;
+using AbstractOrderFoodService.BindingModel;
 using AbstractOrderFoodService.ImplementationOfInter;
 using AbstractOrderFoodService.Interfaces;
 using System;
@@ -20,31 +21,34 @@ namespace AbstractOrderFoodService.ImplementationsList
 
         public List<CustomersViewModel> GetList()
         {
-            List<CustomersViewModel> result = new List<CustomersViewModel>();
-            for(int i=0; i<source.Customer.Count; ++i)
-            {
-                result.Add(new CustomersViewModel
+            List<CustomersViewModel> result = source.Customer
+                .Select(rec => new CustomersViewModel
                 {
-                    Id = source.Customer[i].Id,
-                    CustomersFIO = source.Customer[i].CustomersFIO
-                });
-            }
-
+                    Id = rec.Id,
+                    CustomersFIO = rec.CustomersFIO
+                })
+            .ToList();
             return result;
+
+            /*List<CustomersViewModel> result1 = (from rec in source.Customer
+                                                select new CustomersViewModel
+                                                {
+                                                    Id = rec.Id,
+                                                    CustomersFIO = rec.CustomersFIO
+                                                }).ToList();
+            return result1;*/
         }
 
         public CustomersViewModel GetElement(int id)
         {
-            for(int i=0; i<source.Customer.Count; ++i)
+            Customers element = source.Customer.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                if(source.Customer[i].Id == id)
+                return new CustomersViewModel
                 {
-                    return new CustomersViewModel
-                    {
-                        Id = source.Customer[i].Id,
-                        CustomersFIO = source.Customer[i].CustomersFIO
-                    };
-                }
+                    Id = element.Id,
+                    CustomersFIO = element.CustomersFIO
+                };
             }
 
             throw new Exception("Элемент не найден");
@@ -52,19 +56,13 @@ namespace AbstractOrderFoodService.ImplementationsList
 
         public void AddElement(CustomersBindingModel model)
         {
-            int maxId = 0;
-            for(int i=0;i<source.Customer.Count; ++i)
+            Customers element = source.Customer.FirstOrDefault(rec => rec.CustomersFIO == model.CustomersFIO);
+            if (element != null)
             {
-                if (source.Customer[i].Id > maxId)
-                {
-                    maxId = source.Customer[i].Id;
-                }
-                if(source.Customer[i].CustomersFIO == model.CustomersFIO)
-                {
-                    throw new Exception("Уже есть заказчик с таким ФИО");
-                }
+                throw new Exception("Уже есть заказчик с таким ФИО");
             }
-            source.Customer.Add(new AbstractOrderFood.Customers
+            int maxId = source.Customer.Count > 0 ? source.Customer.Max(rec => rec.Id) : 0;
+            source.Customer.Add(new Customers
             {
                 Id = maxId + 1,
                 CustomersFIO = model.CustomersFIO
@@ -73,36 +71,32 @@ namespace AbstractOrderFoodService.ImplementationsList
 
         public void UpdElement(CustomersBindingModel model)
         {
-            int index = -1;
-            for(int i=0; i<source.Customer.Count; ++i)
+            Customers element = source.Customer.FirstOrDefault(rec =>
+                                       rec.CustomersFIO == model.CustomersFIO && rec.Id != model.Id);
+            if (element != null)
             {
-                if(source.Customer[i].Id == model.Id)
-                {
-                    index = i;
-                }
-                if(source.Customer[i].CustomersFIO == model.CustomersFIO && source.Customer[i].Id != model.Id)
-                {
-                    throw new Exception("Уже есть заказчик с таким ФИО");
-                }
+                throw new Exception("Уже есть заказчик с таким ФИО");
             }
-            if(index == -1)
+            element = source.Customer.FirstOrDefault(rec => rec.Id == model.Id);
+            if (element == null)
             {
                 throw new Exception("Элемент не найден");
             }
-            source.Customer[index].CustomersFIO = model.CustomersFIO;
+            element.CustomersFIO = model.CustomersFIO;
         }
 
         public void DelElement(int id)
         {
-            for(int i=0; i<source.Customer.Count; ++i)
+            Customers element = source.Customer.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                if(source.Customer[i].Id == id)
-                {
-                    source.Customer.RemoveAt(i);
-                    return;
-                }
+                source.Customer.Remove(element);
             }
-            throw new Exception("Элемент не найден");
+            else
+            {
+                throw new Exception("Элемент не найден");
+            }
         }
     }
 }
+

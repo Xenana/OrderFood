@@ -21,82 +21,52 @@ namespace AbstractOrderFoodService.ImplementationsList
 
         public List<CourseSetsViewModel> GetList()
         {
-            List<CourseSetsViewModel> result = new List<CourseSetsViewModel>();
-            for (int i = 0; i < source.CourseSet.Count; ++i)
-            {
-                List<CourseSetsCoursesViewModel> courseSetsCourses = new List<CourseSetsCoursesViewModel>();
-                for (int j = 0; j < source.CourseSetsCourse.Count; ++j)
+            List<CourseSetsViewModel> result = source.CourseSet
+                .Select(rec => new CourseSetsViewModel
                 {
-                    if (source.CourseSetsCourse[j].CourseSetsId == source.CourseSet[i].Id)
-                    {
-                        string courseName = string.Empty;
-                        for (int k = 0; k < source.Course.Count; ++k)
-                        {
-                            if (source.CourseSetsCourse[j].CoursesId == source.Course[k].Id)
+                    Id = rec.Id,
+                    CourseSetsName = rec.CourseSetsName,
+                    Cost = rec.Cost,
+                    CourseSetsCourses = source.CourseSetsCourse
+                            .Where(recCSC => recCSC.CourseSetsId == rec.Id)
+                            .Select(recCSC => new CourseSetsCoursesViewModel
                             {
-                                courseName = source.Course[k].CoursesName;
-                                break;
-                            }
-                        }
-                        courseSetsCourses.Add(new CourseSetsCoursesViewModel
-                        {
-                            Id = source.CourseSetsCourse[j].Id,
-                            CourseSetsId = source.CourseSetsCourse[j].CourseSetsId,
-                            CoursesId = source.CourseSetsCourse[j].CoursesId,
-                            CoursesName = courseName,
-                            Count = source.CourseSetsCourse[j].Count
-                        });
-                    }
-                }
-                result.Add(new CourseSetsViewModel
-                {
-                    Id = source.CourseSet[i].Id,
-                    CourseSetsName = source.CourseSet[i].CourseSetsName,
-                    Cost = source.CourseSet[i].Cost,
-                    CourseSetsCourses = courseSetsCourses
-                });
-            }
+                                Id = recCSC.Id,
+                                CourseSetsId = recCSC.CourseSetsId,
+                                CoursesId = recCSC.CoursesId,
+                                CoursesName = source.Course
+                                    .FirstOrDefault(recC => recC.Id == recCSC.CoursesId)?.CoursesName,
+                                Count = recCSC.Count
+                            })
+                            .ToList()
+                })
+                .ToList();
             return result;
         }
 
         public CourseSetsViewModel GetElement(int id)
         {
-            for (int i = 0; i < source.CourseSet.Count; ++i)
+            CourseSets element = source.CourseSet.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                List<CourseSetsCoursesViewModel> courseSetsCourses = new List<CourseSetsCoursesViewModel>();
-                for (int j = 0; j < source.CourseSetsCourse.Count; ++j)
+                return new CourseSetsViewModel
                 {
-                    if (source.CourseSetsCourse[j].CourseSetsId == source.CourseSet[i].Id)
-                    {
-                        string courseName = string.Empty;
-                        for (int k = 0; k < source.Course.Count; ++k)
-                        {
-                            if (source.CourseSetsCourse[j].CoursesId == source.Course[k].Id)
+                    Id = element.Id,
+                    CourseSetsName = element.CourseSetsName,
+                    Cost = element.Cost,
+                    CourseSetsCourses = source.CourseSetsCourse
+                            .Where(recCSC => recCSC.CourseSetsId == element.Id)
+                            .Select(recCSC => new CourseSetsCoursesViewModel
                             {
-                                courseName = source.Course[k].CoursesName;
-                                break;
-                            }
-                        }
-                        courseSetsCourses.Add(new CourseSetsCoursesViewModel
-                        {
-                            Id = source.CourseSetsCourse[j].Id,
-                            CourseSetsId = source.CourseSetsCourse[j].CourseSetsId,
-                            CoursesId = source.CourseSetsCourse[j].CoursesId,
-                            CoursesName = courseName,
-                            Count = source.CourseSetsCourse[j].Count
-                        });
-                    }
-                }
-                if (source.CourseSet[i].Id == id)
-                {
-                    return new CourseSetsViewModel
-                    {
-                        Id = source.CourseSet[i].Id,
-                        CourseSetsName = source.CourseSet[i].CourseSetsName,
-                        Cost = source.CourseSet[i].Cost,
-                        CourseSetsCourses = courseSetsCourses
-                    };
-                }
+                                Id = recCSC.Id,
+                                CourseSetsId = recCSC.CourseSetsId,
+                                CoursesId = recCSC.CoursesId,
+                                CoursesName = source.Course
+                                        .FirstOrDefault(recC => recC.Id == recCSC.CoursesId)?.CoursesName,
+                                Count = recCSC.Count
+                            })
+                            .ToList()
+                };
             }
 
             throw new Exception("Элемент не найден");
@@ -104,151 +74,111 @@ namespace AbstractOrderFoodService.ImplementationsList
 
         public void AddElement(CourseSetsBindingModel model)
         {
-            int maxId = 0;
-            for (int i = 0; i < source.CourseSet.Count; ++i)
+            CourseSets element = source.CourseSet.FirstOrDefault(rec => rec.CourseSetsName == model.CourseSetName);
+            if (element != null)
             {
-                if (source.CourseSet[i].Id > maxId)
-                {
-                    maxId = source.CourseSet[i].Id;
-                }
-                if (source.CourseSet[i].CourseSetsName == model.CourseSetName)
-                {
-                    throw new Exception("Уже есть набор блюд с таким названием");
-                }
+                throw new Exception("Уже есть набор блюд с таким названием");
             }
+            int maxId = source.CourseSet.Count > 0 ? source.CourseSet.Max(rec => rec.Id) : 0;
             source.CourseSet.Add(new CourseSets
             {
                 Id = maxId + 1,
                 CourseSetsName = model.CourseSetName,
                 Cost = model.Cost
             });
-            int maxCSCId = 0;
-            for (int i = 0; i < source.CourseSetsCourse.Count; ++i)
-            {
-                if (source.CourseSetsCourse[i].Id > maxCSCId)
-                {
-                    maxCSCId = source.CourseSetsCourse[i].Id;
-                }
-            }
-            for (int i = 0; i < model.CourseSetsCourses.Count; ++i)
-            {
-                for (int j = 1; j < model.CourseSetsCourses.Count; ++j)
-                {
-                    if (model.CourseSetsCourses[i].CoursesId ==
-                        model.CourseSetsCourses[j].CoursesId)
-                    {
-                        model.CourseSetsCourses[i].Count +=
-                            model.CourseSetsCourses[j].Count;
-                        model.CourseSetsCourses.RemoveAt(j--);
-                    }
-                }
-            }
-            for (int i = 0; i < model.CourseSetsCourses.Count; ++i)
+            int maxCSCId = source.CourseSetsCourse.Count > 0 ?
+                                    source.CourseSetsCourse.Max(rec => rec.Id) : 0;
+            var groupCourses = model.CourseSetsCourses
+                                        .GroupBy(rec => rec.CoursesId)
+                                        .Select(rec => new
+                                        {
+                                            CoursesId = rec.Key,
+                                            Count = rec.Sum(r => r.Count)
+                                        });
+            foreach (var groupCourse in groupCourses)
             {
                 source.CourseSetsCourse.Add(new CourseSetsCourses
                 {
                     Id = ++maxCSCId,
                     CourseSetsId = maxId + 1,
-                    CoursesId = model.CourseSetsCourses[i].CoursesId,
-                    Count = model.CourseSetsCourses[i].Count
+                    CoursesId = groupCourse.CoursesId,
+                    Count = groupCourse.Count
                 });
             }
         }
 
         public void UpdElement(CourseSetsBindingModel model)
         {
-            int index = -1;
-            for (int i = 0; i < source.CourseSet.Count; ++i)
+            CourseSets element = source.CourseSet.FirstOrDefault(rec =>
+                                        rec.CourseSetsName == model.CourseSetName && rec.Id != model.Id);
+            if (element != null)
             {
-                if (source.CourseSet[i].Id == model.Id)
-                {
-                    index = i;
-                }
-                if (source.CourseSet[i].CourseSetsName == model.CourseSetName &&
-                    source.CourseSet[i].Id != model.Id)
-                {
-                    throw new Exception("Уже есть набор блюд с таким названием");
-                }
+                throw new Exception("Уже есть набор блюд с таким названием");
             }
-            if (index == -1)
+            element = source.CourseSet.FirstOrDefault(rec => rec.Id == model.Id);
+            if (element == null)
             {
                 throw new Exception("Элемент не найден");
             }
-            source.CourseSet[index].CourseSetsName = model.CourseSetName;
-            int maxCSCId = 0;
-            for (int i = 0; i < source.CourseSetsCourse.Count; ++i)
+            element.CourseSetsName = model.CourseSetName;
+            element.Cost = model.Cost;
+
+            int maxCSCId = source.CourseSetsCourse.Count > 0 ? source.CourseSetsCourse.Max(rec => rec.Id) : 0;
+            var courIds = model.CourseSetsCourses.Select(rec => rec.CoursesId).Distinct();
+            var updateCourses = source.CourseSetsCourse
+                                            .Where(rec => rec.CourseSetsId == model.Id &&
+                                            courIds.Contains(rec.CoursesId));
+            foreach (var updateCourse in updateCourses)
             {
-                if (source.CourseSetsCourse[i].Id > maxCSCId)
-                {
-                    maxCSCId = source.CourseSetsCourse[i].Id;
-                }
+                updateCourse.Count = model.CourseSetsCourses
+                                                .FirstOrDefault(rec => rec.Id == updateCourse.Id).Count;
             }
-            for (int i = 0; i < source.CourseSetsCourse.Count; ++i)
+            source.CourseSetsCourse.RemoveAll(rec => rec.CourseSetsId == model.Id &&
+                                        !courIds.Contains(rec.CoursesId));
+            var groupCourses = model.CourseSetsCourses
+                                        .Where(rec => rec.Id == 0)
+                                        .GroupBy(rec => rec.CoursesId)
+                                        .Select(rec => new
+                                        {
+                                            CoursesId = rec.Key,
+                                            Count = rec.Sum(r => r.Count)
+                                        });
+            foreach (var groupCourse in groupCourses)
             {
-                if (source.CourseSetsCourse[i].CourseSetsId == model.Id)
+                CourseSetsCourses elementCSC = source.CourseSetsCourse
+                                        .FirstOrDefault(rec => rec.CourseSetsId == model.Id &&
+                                                        rec.CoursesId == groupCourse.CoursesId);
+                if (elementCSC != null)
                 {
-                    bool flag = true;
-                    for (int j = 0; j < model.CourseSetsCourses.Count; ++j)
-                    {
-                        if (source.CourseSetsCourse[i].Id == model.CourseSetsCourses[j].Id)
-                        {
-                            source.CourseSetsCourse[i].Count = model.CourseSetsCourses[j].Count;
-                            flag = false;
-                            break;
-                        }
-                    }
-                    if (flag)
-                    {
-                        source.CourseSetsCourse.RemoveAt(i--);
-                    }
+                    elementCSC.Count += groupCourse.Count;
                 }
-            }
-            for (int i = 0; i < model.CourseSetsCourses.Count; ++i)
-            {
-                if (model.CourseSetsCourses[i].Id == 0)
+                else
                 {
-                    for (int j = 0; j < source.CourseSetsCourse.Count; ++j)
+                    source.CourseSetsCourse.Add(new CourseSetsCourses
                     {
-                        if (source.CourseSetsCourse[j].CourseSetsId == model.Id &&
-                            source.CourseSetsCourse[j].CourseSetsId == model.CourseSetsCourses[i].CoursesId)
-                        {
-                            source.CourseSetsCourse[j].Count += model.CourseSetsCourses[i].Count;
-                            model.CourseSetsCourses[i].Id = source.CourseSetsCourse[j].Id;
-                            break;
-                        }
-                    }
-                    if (model.CourseSetsCourses[i].Id == 0)
-                    {
-                        source.CourseSetsCourse.Add(new CourseSetsCourses
-                        {
-                            Id = ++maxCSCId,
-                            CourseSetsId = model.Id,
-                            CoursesId = model.CourseSetsCourses[i].CoursesId,
-                            Count = model.CourseSetsCourses[i].Count
-                        });
-                    }
+                        Id = ++maxCSCId,
+                        CourseSetsId = model.Id,
+                        CoursesId = groupCourse.CoursesId,
+                        Count = groupCourse.Count
+                    });
                 }
             }
         }
 
         public void DelElement(int id)
         {
-            for (int i = 0; i < source.CourseSetsCourse.Count; ++i)
+            CourseSets element = source.CourseSet.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                if (source.CourseSetsCourse[i].CourseSetsId == id)
-                {
-                    source.CourseSetsCourse.RemoveAt(i--);
-                }
+                // удаяем записи по компонентам при удалении изделия
+                source.CourseSetsCourse.RemoveAll(rec => rec.CourseSetsId == id);
+                source.CourseSet.Remove(element);
             }
-            for (int i = 0; i < source.CourseSet.Count; ++i)
+            else
             {
-                if (source.CourseSet[i].Id == id)
-                {
-                    source.CourseSet.RemoveAt(i);
-                    return;
-                }
+                throw new Exception("Элемент не найден");
             }
-            throw new Exception("Элемент не найден");
+            
         }
     }
 }
