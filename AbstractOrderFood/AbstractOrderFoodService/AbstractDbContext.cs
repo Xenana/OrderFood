@@ -9,9 +9,10 @@ using AbstractOrderFood;
 
 namespace AbstractOrderFoodService
 {
+    [Table("OrderFoodDatabase_lab13")]
     public class AbstractDbContext : DbContext
     {
-        public AbstractDbContext() : base("AbstractDatabase")
+        public AbstractDbContext()
         {
             //настройки конфигурации для entity
             Configuration.ProxyCreationEnabled = false;
